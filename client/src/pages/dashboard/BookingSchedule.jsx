@@ -44,7 +44,7 @@ const BookingSchedule = () => {
     const handleUpdateStatus = async (id, status) => {
         if (!confirm(`ยืนยันการ${status === 'paid' ? 'อนุมัติ' : 'ยกเลิก'}การจอง?`)) return;
         try {
-            await axios.put(`http://localhost:5000/api/booking/${id}/status`, { status });
+            await api.put(`/booking/${id}/status`, { status });
             fetchBookings(); // Refresh
         } catch (error) {
             console.error('Error updating status:', error);
