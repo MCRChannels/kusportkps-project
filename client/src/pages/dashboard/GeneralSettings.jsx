@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { supabase } from '../../lib/supabase';
 import api from '../../lib/api';
-import { Save, Upload, Building, CreditCard, QrCode, X } from 'lucide-react';
+import { Save, Upload, Building, CreditCard, QrCode, X, Settings } from 'lucide-react';
 
 const GeneralSettings = () => {
     const [settings, setSettings] = useState({
@@ -92,7 +92,10 @@ const GeneralSettings = () => {
 
     return (
         <div className="space-y-6">
-            <h1 className="text-2xl font-bold text-gray-800">ตั้งค่าทั่วไป (General Settings)</h1>
+            <h1 className="text-2xl font-bold text-gray-800 flex items-center">
+                <Settings className="mr-2 text-green-600" />
+                ตั้งค่าทั่วไป
+            </h1>
 
             {message && (
                 <div className={`p-4 rounded ${message.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
@@ -100,13 +103,13 @@ const GeneralSettings = () => {
                 </div>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 {/* Bank Details */}
-                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                <div className="bg-white p-5 rounded-lg shadow-sm border border-gray-200">
                     <h2 className="text-lg font-bold text-gray-700 mb-4 flex items-center gap-2">
                         <Building size={20} /> ข้อมูลบัญชีธนาคาร
                     </h2>
-                    <div className="space-y-4">
+                    <div className="space-y-3">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">ชื่อธนาคาร</label>
                             <input
@@ -114,7 +117,7 @@ const GeneralSettings = () => {
                                 name="bank_name"
                                 value={settings.bank_name || ''}
                                 onChange={handleChange}
-                                className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-green-500 outline-none"
+                                className="w-full px-3 py-1.5 border border-gray-300 rounded focus:ring-2 focus:ring-green-500 outline-none text-sm"
                                 placeholder="เช่น SCB, KBank"
                             />
                         </div>
@@ -125,7 +128,7 @@ const GeneralSettings = () => {
                                 name="bank_account_name"
                                 value={settings.bank_account_name || ''}
                                 onChange={handleChange}
-                                className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-green-500 outline-none"
+                                className="w-full px-3 py-1.5 border border-gray-300 rounded focus:ring-2 focus:ring-green-500 outline-none text-sm"
                             />
                         </div>
                         <div>
@@ -135,30 +138,30 @@ const GeneralSettings = () => {
                                 name="bank_account_number"
                                 value={settings.bank_account_number || ''}
                                 onChange={handleChange}
-                                className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-green-500 outline-none"
+                                className="w-full px-3 py-1.5 border border-gray-300 rounded focus:ring-2 focus:ring-green-500 outline-none text-sm"
                             />
                         </div>
                     </div>
                 </div>
 
                 {/* QR Code */}
-                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 h-fit">
+                <div className="bg-white p-5 rounded-lg shadow-sm border border-gray-200 h-fit">
                     <h2 className="text-lg font-bold text-gray-700 mb-4 flex items-center gap-2">
                         <QrCode size={20} /> QR Code สำหรับรับชำระเงิน
                     </h2>
 
-                    <div className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg p-6 bg-gray-50 mb-4">
+                    <div className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg p-4 bg-gray-50 mb-3">
                         {settings.payment_qr_url ? (
-                            <img src={settings.payment_qr_url} alt="Payment QR" className="max-h-64 object-contain mb-4" />
+                            <img src={settings.payment_qr_url} alt="Payment QR" className="max-h-48 object-contain mb-3" />
                         ) : (
-                            <div className="text-gray-400 mb-4 flex flex-col items-center">
-                                <QrCode size={48} className="mb-2" />
-                                <span>ยังไม่มี QR Code</span>
+                            <div className="text-gray-400 mb-3 flex flex-col items-center">
+                                <QrCode size={40} className="mb-2" />
+                                <span className="text-sm">ยังไม่มี QR Code</span>
                             </div>
                         )}
 
-                        <label className="cursor-pointer bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2 rounded shadow-sm flex items-center gap-2 transition-colors">
-                            <Upload size={16} />
+                        <label className="cursor-pointer bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-3 py-1.5 rounded shadow-sm flex items-center gap-2 transition-colors text-sm">
+                            <Upload size={14} />
                             {uploading ? 'กำลังอัปโหลด...' : 'อัปโหลดรูปภาพ'}
                             <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileUpload(e, 'qr')} disabled={uploading} />
                         </label>
@@ -166,12 +169,12 @@ const GeneralSettings = () => {
                 </div>
 
                 {/* Hero Banners */}
-                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 md:col-span-2">
+                <div className="bg-white p-5 rounded-lg shadow-sm border border-gray-200 md:col-span-2">
                     <h2 className="text-lg font-bold text-gray-700 mb-4 flex items-center gap-2">
                         <Upload size={20} /> แบนเนอร์หน้าแรก (Hero Banners)
                     </h2>
 
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-3">
                         {(() => {
                             let banners = [];
                             try {
@@ -189,15 +192,15 @@ const GeneralSettings = () => {
                                         }}
                                         className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-sm hover:bg-red-600"
                                     >
-                                        <X size={16} />
+                                        <X size={14} />
                                     </button>
                                 </div>
                             ));
                         })()}
 
-                        <label className="cursor-pointer border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center p-4 hover:bg-gray-50 transition-colors aspect-video">
-                            <Upload size={24} className="text-gray-400 mb-2" />
-                            <span className="text-sm text-gray-500">{uploading ? 'กำลัง...' : 'เพิ่มรูปภาพ'}</span>
+                        <label className="cursor-pointer border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center p-3 hover:bg-gray-50 transition-colors aspect-video">
+                            <Upload size={20} className="text-gray-400 mb-1" />
+                            <span className="text-xs text-gray-500 font-medium">{uploading ? 'กำลัง...' : 'เพิ่มรูปภาพ'}</span>
                             <input
                                 type="file"
                                 className="hidden"
@@ -207,17 +210,17 @@ const GeneralSettings = () => {
                             />
                         </label>
                     </div>
-                    <p className="text-xs text-gray-500">* รองรับรูปภาพไม่จำกัดจำนวน (ขนาดแนะนำ 1920x600px)</p>
+                    <p className="text-xs text-gray-400">* รองรับรูปภาพไม่จำกัดจำนวน (แนะนำขนาด 1920x600px)</p>
                 </div>
             </div>
 
-            <div className="flex justify-end">
+            <div className="flex justify-end pt-2">
                 <button
                     onClick={handleSave}
                     disabled={loading}
-                    className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded shadow-md font-bold flex items-center gap-2 transition-colors"
+                    className="bg-green-600 hover:bg-green-700 text-white px-6 py-2.5 rounded shadow-lg font-bold flex items-center gap-2 transition-colors transform active:scale-95"
                 >
-                    <Save size={20} />
+                    <Save size={18} />
                     บันทึกการตั้งค่า
                 </button>
             </div>

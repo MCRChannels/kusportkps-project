@@ -84,19 +84,19 @@ const BookingSchedule = () => {
             {/* Tools Bar */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-200 pb-4">
                 {/* Filter Tabs */}
-                <div className="flex space-x-2 overflow-x-auto">
+                <div className="flex space-x-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 scrollbar-hide">
                     {['pending', 'paid', 'cancelled', 'all'].map(f => (
                         <button
                             key={f}
                             onClick={() => setFilter(f)}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium transition whitespace-nowrap ${filter === f
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition whitespace-nowrap flex-shrink-0 ${filter === f
                                 ? 'bg-green-100 text-green-700'
                                 : 'text-gray-500 hover:bg-gray-50'
                                 }`}
                         >
-                            {f === 'pending' && 'รอตรวจสอบ (Pending)'}
-                            {f === 'paid' && 'อนุมัติแล้ว (Approved)'}
-                            {f === 'cancelled' && 'ยกเลิก (Cancelled)'}
+                            {f === 'pending' && 'รอตรวจสอบ'}
+                            {f === 'paid' && 'อนุมัติแล้ว'}
+                            {f === 'cancelled' && 'ยกเลิก'}
                             {f === 'all' && 'ทั้งหมด'}
                         </button>
                     ))}
@@ -106,7 +106,7 @@ const BookingSchedule = () => {
                 <div className="relative w-full md:w-auto">
                     <input
                         type="text"
-                        placeholder="ค้นหาชื่อ, อีเมล, ID..."
+                        placeholder="ค้นหาชื่อ, อีเมล, ID"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none w-full md:w-64"
@@ -124,39 +124,39 @@ const BookingSchedule = () => {
                 ) : (
                     <div className="divide-y divide-gray-100">
                         {filteredBookings.map((booking) => (
-                            <div key={booking.id} className="p-6 hover:bg-gray-50 transition flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                            <div key={booking.id} className="p-4 md:p-6 hover:bg-gray-50 transition flex flex-col lg:flex-row lg:items-center justify-between gap-4 md:gap-6">
                                 {/* Booking Info */}
-                                <div className="flex items-start space-x-4">
-                                    <div className="w-14 h-14 bg-green-100 rounded-xl flex flex-col items-center justify-center text-green-700 font-bold shrink-0 border border-green-200">
-                                        <span className="text-xs uppercase">{format(new Date(booking.booking_date), 'MMM', { locale: th })}</span>
-                                        <span className="text-xl">{format(new Date(booking.booking_date), 'd')}</span>
+                                <div className="flex items-start space-x-3 md:space-x-4">
+                                    <div className="w-12 h-12 md:w-14 md:h-14 bg-green-100 rounded-xl flex flex-col items-center justify-center text-green-700 font-bold shrink-0 border border-green-200">
+                                        <span className="text-[10px] md:text-xs uppercase">{format(new Date(booking.booking_date), 'MMM', { locale: th })}</span>
+                                        <span className="text-lg md:text-xl">{format(new Date(booking.booking_date), 'd')}</span>
                                     </div>
-                                    <div>
-                                        <div className="flex items-center gap-2">
-                                            <h4 className="font-bold text-gray-900 text-lg">{booking.courts?.name || 'Unknown Court'}</h4>
-                                            <span className={`px-2 py-0.5 rounded text-xs font-semibold border ${booking.status === 'paid' ? 'bg-green-50 text-green-700 border-green-200' :
+                                    <div className="min-w-0 flex-1">
+                                        <div className="flex flex-wrap items-center gap-2">
+                                            <h4 className="font-bold text-gray-900 text-base md:text-lg truncate">{booking.courts?.name || 'Unknown Court'}</h4>
+                                            <span className={`px-2 py-0.5 rounded text-[10px] md:text-xs font-semibold border ${booking.status === 'paid' ? 'bg-green-50 text-green-700 border-green-200' :
                                                 booking.status === 'cancelled' ? 'bg-red-50 text-red-700 border-red-200' :
                                                     'bg-yellow-50 text-yellow-700 border-yellow-200'
                                                 }`}>
                                                 {booking.status === 'paid' ? 'APPROVED' : booking.status.toUpperCase()}
                                             </span>
                                         </div>
-                                        <div className="flex flex-wrap items-center text-sm text-gray-500 mt-1 gap-y-1">
-                                            <span className="flex items-center mr-4"><Clock size={14} className="mr-1" /> {booking.start_time.slice(0, 5)} - {booking.end_time.slice(0, 5)}</span>
-                                            <span className="flex items-center mr-4"><User size={14} className="mr-1" /> {booking.profiles?.first_name} {booking.profiles?.last_name} ({booking.profiles?.email})</span>
+                                        <div className="flex flex-col sm:flex-row sm:items-center text-xs md:text-sm text-gray-500 mt-1 gap-1 sm:gap-4">
+                                            <span className="flex items-center"><Clock size={14} className="mr-1 shrink-0" /> {booking.start_time.slice(0, 5)} - {booking.end_time.slice(0, 5)}</span>
+                                            <span className="flex items-center"><User size={14} className="mr-1 shrink-0" /> <span className="truncate max-w-[150px] sm:max-w-none">{booking.profiles?.first_name} {booking.profiles?.last_name}</span></span>
                                         </div>
-                                        <div className="text-xs text-gray-400 mt-1">Booking ID: {booking.id} • จองเมื่อ: {new Date(booking.created_at).toLocaleString('th-TH')}</div>
+                                        <div className="text-[10px] md:text-xs text-gray-400 mt-1 truncate">ID: {booking.id} • จอง: {new Date(booking.created_at).toLocaleString('th-TH')}</div>
                                     </div>
                                 </div>
 
                                 {/* Actions */}
-                                <div className="flex items-center gap-3">
+                                <div className="flex items-center gap-2 self-end lg:self-center w-full lg:w-auto justify-end">
                                     {booking.payment_proof_url && (
                                         <button
                                             onClick={() => setSelectedSlip(booking.payment_proof_url)}
-                                            className="px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 transition"
+                                            className="px-3 py-1.5 md:px-3 md:py-2 text-xs md:text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 transition whitespace-nowrap"
                                         >
-                                            ดูสลิปโอนเงิน
+                                            ดูสลิป
                                         </button>
                                     )}
 
@@ -164,13 +164,13 @@ const BookingSchedule = () => {
                                         <>
                                             <button
                                                 onClick={() => handleUpdateStatus(booking.id, 'paid')}
-                                                className="px-4 py-2 text-sm font-bold text-white bg-green-600 hover:bg-green-700 rounded-lg shadow-sm transition"
+                                                className="px-3 py-1.5 md:px-4 md:py-2 text-xs md:text-sm font-bold text-white bg-green-600 hover:bg-green-700 rounded-lg shadow-sm transition whitespace-nowrap"
                                             >
                                                 อนุมัติ
                                             </button>
                                             <button
                                                 onClick={() => handleUpdateStatus(booking.id, 'cancelled')}
-                                                className="px-4 py-2 text-sm font-bold text-red-600 bg-white border border-red-200 hover:bg-red-50 rounded-lg transition"
+                                                className="px-3 py-1.5 md:px-4 md:py-2 text-xs md:text-sm font-bold text-red-600 bg-white border border-red-200 hover:bg-red-50 rounded-lg transition whitespace-nowrap"
                                             >
                                                 ยกเลิก
                                             </button>
@@ -181,10 +181,10 @@ const BookingSchedule = () => {
                                     {booking.status === 'paid' && (
                                         <button
                                             onClick={() => handleUpdateStatus(booking.id, 'cancelled')}
-                                            className="px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg border border-transparent hover:border-red-200 transition"
+                                            className="px-3 py-1.5 md:px-4 md:py-2 text-xs md:text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg border border-transparent hover:border-red-200 transition whitespace-nowrap"
                                             title="ลูกค้าไม่มาตามนัดหมาย (เกิน 15 นาที)"
                                         >
-                                            ยกเลิก (ไม่มาแสดงตัว)
+                                            ยกเลิก (ไม่มา)
                                         </button>
                                     )}
                                 </div>

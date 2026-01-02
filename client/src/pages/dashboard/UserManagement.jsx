@@ -68,7 +68,7 @@ const UserManagement = () => {
                     </div>
                     <input
                         type="text"
-                        placeholder="พิมพ์ชื่อผู้ใช้ที่ต้องการหา หรือ email ตรงนี้"
+                        placeholder="ค้นหาชื่อ, email"
                         className="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-4 focus:ring-green-100 focus:border-green-500 outline-none transition-all text-gray-700 bg-gray-50/50 focus:bg-white"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
@@ -83,7 +83,8 @@ const UserManagement = () => {
                 </div>
             </div>
 
-            <div className="bg-white shadow-sm rounded-xl overflow-hidden border border-gray-100">
+            {/* Desktop Table View */}
+            <div className="bg-white shadow-sm rounded-xl overflow-hidden border border-gray-100 hidden md:block">
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
@@ -112,9 +113,9 @@ const UserManagement = () => {
                                         onChange={(e) => handleRoleChange(user.id, e.target.value)}
                                         className="text-sm border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring-green-500"
                                     >
-                                        <option value="user">User</option>
-                                        <option value="staff">Staff</option>
-                                        <option value="admin">Admin</option>
+                                        <option value="user">ผู้ใช้งาน</option>
+                                        <option value="staff">เจ้าหน้าที่</option>
+                                        <option value="admin">ผู้ดูแลระบบ</option>
                                     </select>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-xs text-gray-400">
@@ -124,6 +125,38 @@ const UserManagement = () => {
                         ))}
                     </tbody>
                 </table>
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="grid grid-cols-1 gap-4 md:hidden">
+                {filteredUsers.map((user) => (
+                    <div key={user.id} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col gap-3">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <div className="h-10 w-10 bg-green-100 rounded-full flex items-center justify-center text-green-600 shrink-0">
+                                    <User size={20} />
+                                </div>
+                                <div className="overflow-hidden">
+                                    <div className="font-bold text-gray-900 truncate">{user.username || 'No Username'}</div>
+                                    <div className="text-xs text-gray-500 truncate">{user.email}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center justify-between pt-2 border-t border-gray-50">
+                            <span className="text-sm text-gray-500">สิทธิการใช้งาน:</span>
+                            <select
+                                value={user.role}
+                                onChange={(e) => handleRoleChange(user.id, e.target.value)}
+                                className="text-sm border-gray-200 rounded-lg shadow-sm focus:border-green-500 focus:ring-green-500 py-1.5 pl-3 pr-8"
+                            >
+                                <option value="user">ผู้ใช้งาน</option>
+                                <option value="staff">เจ้าหน้าที่</option>
+                                <option value="admin">ผู้ดูแลระบบ</option>
+                            </select>
+                        </div>
+                    </div>
+                ))}
             </div>
         </div>
     );

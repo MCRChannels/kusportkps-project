@@ -42,10 +42,7 @@ const CourtManagement = () => {
         timeOptions.push(`${hour}:00`);
         timeOptions.push(`${hour}:30`);
     }
-    // Also add end of day if needed, but 23:30 is usually last start slot.
-    // Let's stick to 30 min intervals, or maybe just hours as requested "make it simple 24h"
-    // User asked "Make it 24 hours better", usually implies 00:00 - 23:00.
-    // Let's do hourly to be safe and simple, or 30 mins if granular. Hourly is safer for "simple".
+
     const simpleTimeOptions = [];
     for (let i = 0; i <= 23; i++) {
         simpleTimeOptions.push(`${i.toString().padStart(2, '0')}:00`);
@@ -220,10 +217,10 @@ const CourtManagement = () => {
                 <div className="flex justify-between items-center">
                     <h2 className="text-2xl font-bold text-gray-800 flex items-center">
                         <LayoutDashboard className="mr-2 text-green-600" />
-                        จัดการหมวดหมู่และสนาม
+                        จัดการสนาม
                     </h2>
                     <button onClick={() => openCategoryModal()} className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center">
-                        <Plus size={18} className="mr-2" /> เพิ่มหมวดหมู่
+                        <Plus size={18} className="mr-2" /> เพิ่มสนาม
                     </button>
                 </div>
             )}
@@ -238,7 +235,7 @@ const CourtManagement = () => {
                             <h2 className="text-2xl font-bold text-gray-800 flex items-center">
                                 {selectedCategory?.name}
                             </h2>
-                            <p className="text-sm text-gray-500">จัดการสนามในหมวดหมู่นี้</p>
+                            <p className="text-sm text-gray-500">จัดการสนาม</p>
                         </div>
                     </div>
                     <button onClick={() => openCourtModal()} className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center">
@@ -249,92 +246,165 @@ const CourtManagement = () => {
 
             {/* Content Area */}
             {viewMode === 'categories' && (
-                <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                    <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
-                            <tr>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Icon</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">หมวดหมู่</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">รายละเอียด</th>
-                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">สนามทั้งหมด</th>
-                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">จัดการ</th>
-                            </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                            {categories.map((cat) => {
-                                const courtCount = courts.filter(c => c.category_id == cat.id || (c.sport_categories && c.sport_categories.id == cat.id)).length;
-                                return (
-                                    <tr key={cat.id} className="hover:bg-gray-50">
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <img src={cat.image_url || 'https://via.placeholder.com/40'} alt="" className="h-10 w-10 rounded-full object-cover bg-gray-100" />
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{cat.name}</td>
-                                        <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">{cat.description}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-500">{courtCount} สนาม</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <button
-                                                onClick={() => handleManageCourts(cat)}
-                                                className="bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-xs font-bold hover:bg-blue-100 mr-2 border border-blue-200"
-                                            >
-                                                จัดการสนาม
-                                            </button>
-                                            <button
-                                                onClick={() => openClosingModal(cat)}
-                                                className="bg-red-50 text-red-600 px-3 py-1 rounded-full text-xs font-bold hover:bg-red-100 mr-4 border border-red-200"
-                                            >
-                                                วันปิด/เวลา
-                                            </button>
-                                            <button onClick={() => openCategoryModal(cat)} className="text-gray-400 hover:text-blue-600 mr-2"><Edit2 size={18} /></button>
-                                            <button onClick={() => handleDeleteCategory(cat.id)} className="text-gray-400 hover:text-red-600"><Trash2 size={18} /></button>
-                                        </td>
-                                    </tr>
-                                );
-                            })}
-                        </tbody>
-                    </table>
-                </div>
-            )}
-
-            {viewMode === 'courts' && (
-                <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                    {filteredCourts.length === 0 ? (
-                        <div className="p-12 text-center text-gray-500">
-                            ยังไม่มีสนามในหมวดหมู่นี้
-                        </div>
-                    ) : (
+                <>
+                    {/* Desktop Table View */}
+                    <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hidden md:block">
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-50">
                                 <tr>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">รูปภาพ</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ชื่อสนาม</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ราคา</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">สถานะ</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Icon</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">หมวดหมู่</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">รายละเอียด</th>
+                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">สนามทั้งหมด</th>
                                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">จัดการ</th>
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
-                                {filteredCourts.map((court) => (
-                                    <tr key={court.id} className="hover:bg-gray-50">
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <img src={court.image_url || 'https://via.placeholder.com/40'} alt={court.name} className="h-10 w-10 rounded-full object-cover" />
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm font-medium text-gray-900">{court.name}</div></td>
-                                        <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm text-gray-900">{court.price} บาท/ชม.</div></td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${(court.is_active || court.ticket_available) ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
-                                                {(court.is_active || court.ticket_available) ? "เปิดให้บริการ" : "ปิดปรับปรุง"}
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <button onClick={() => openCourtModal(court)} className="text-blue-600 hover:text-blue-900 mr-4"><Edit2 size={18} /></button>
-                                            <button onClick={() => handleDeleteCourt(court.id)} className="text-red-600 hover:text-red-900"><Trash2 size={18} /></button>
-                                        </td>
-                                    </tr>
-                                ))}
+                                {categories.map((cat) => {
+                                    const courtCount = courts.filter(c => c.category_id == cat.id || (c.sport_categories && c.sport_categories.id == cat.id)).length;
+                                    return (
+                                        <tr key={cat.id} className="hover:bg-gray-50">
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <img src={cat.image_url || 'https://via.placeholder.com/40'} alt="" className="h-10 w-10 rounded-full object-cover bg-gray-100" />
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{cat.name}</td>
+                                            <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">{cat.description}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-500">{courtCount} สนาม</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                                <button
+                                                    onClick={() => handleManageCourts(cat)}
+                                                    className="bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-xs font-bold hover:bg-blue-100 mr-2 border border-blue-200"
+                                                >
+                                                    จัดการสนาม
+                                                </button>
+                                                <button
+                                                    onClick={() => openClosingModal(cat)}
+                                                    className="bg-red-50 text-red-600 px-3 py-1 rounded-full text-xs font-bold hover:bg-red-100 mr-4 border border-red-200"
+                                                >
+                                                    วันปิด/เวลา
+                                                </button>
+                                                <button onClick={() => openCategoryModal(cat)} className="text-gray-400 hover:text-blue-600 mr-2"><Edit2 size={18} /></button>
+                                                <button onClick={() => handleDeleteCategory(cat.id)} className="text-gray-400 hover:text-red-600"><Trash2 size={18} /></button>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
                             </tbody>
                         </table>
-                    )}
-                </div>
+                    </div>
+
+                    {/* Mobile Card View (Categories) */}
+                    <div className="grid grid-cols-1 gap-4 md:hidden">
+                        {categories.map((cat) => {
+                            const courtCount = courts.filter(c => c.category_id == cat.id || (c.sport_categories && c.sport_categories.id == cat.id)).length;
+                            return (
+                                <div key={cat.id} className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+                                    <div className="flex items-center gap-4 mb-3">
+                                        <img src={cat.image_url || 'https://via.placeholder.com/40'} alt="" className="h-12 w-12 rounded-full object-cover bg-gray-100" />
+                                        <div>
+                                            <h3 className="font-bold text-gray-900">{cat.name}</h3>
+                                            <p className="text-xs text-gray-500">{courtCount} สนาม • {cat.open_time?.slice(0, 5)} - {cat.close_time?.slice(0, 5)}</p>
+                                        </div>
+                                    </div>
+                                    <p className="text-sm text-gray-500 mb-4 line-clamp-2">{cat.description}</p>
+
+                                    <div className="flex flex-col gap-2">
+                                        <button onClick={() => handleManageCourts(cat)} className="w-full bg-blue-50 text-blue-600 py-2 rounded-lg text-sm font-bold border border-blue-100">
+                                            จัดการสนาม
+                                        </button>
+                                        <div className="flex gap-2">
+                                            <button onClick={() => openClosingModal(cat)} className="flex-1 bg-red-50 text-red-600 py-2 rounded-lg text-xs font-bold border border-red-100">
+                                                ตั้งวันปิด
+                                            </button>
+                                            <button onClick={() => openCategoryModal(cat)} className="flex items-center justify-center w-10 bg-gray-50 text-gray-600 rounded-lg border border-gray-200"><Edit2 size={16} /></button>
+                                            <button onClick={() => handleDeleteCategory(cat.id)} className="flex items-center justify-center w-10 bg-gray-50 text-red-600 rounded-lg border border-gray-200"><Trash2 size={16} /></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </>
+            )}
+
+            {viewMode === 'courts' && (
+                <>
+                    {/* Desktop Table View */}
+                    <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hidden md:block">
+                        {filteredCourts.length === 0 ? (
+                            <div className="p-12 text-center text-gray-500">
+                                ยังไม่มีสนามในหมวดหมู่นี้
+                            </div>
+                        ) : (
+                            <table className="min-w-full divide-y divide-gray-200">
+                                <thead className="bg-gray-50">
+                                    <tr>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">รูปภาพ</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ชื่อสนาม</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ราคา</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">สถานะ</th>
+                                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">จัดการ</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="bg-white divide-y divide-gray-200">
+                                    {filteredCourts.map((court) => (
+                                        <tr key={court.id} className="hover:bg-gray-50">
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <img src={court.image_url || 'https://via.placeholder.com/40'} alt={court.name} className="h-10 w-10 rounded-full object-cover" />
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm font-medium text-gray-900">{court.name}</div></td>
+                                            <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm text-gray-900">{court.price} บาท/ชม.</div></td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${(court.is_active || court.ticket_available) ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
+                                                    {(court.is_active || court.ticket_available) ? "เปิดให้บริการ" : "ปิดปรับปรุง"}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                                <button onClick={() => openCourtModal(court)} className="text-blue-600 hover:text-blue-900 mr-4"><Edit2 size={18} /></button>
+                                                <button onClick={() => handleDeleteCourt(court.id)} className="text-red-600 hover:text-red-900"><Trash2 size={18} /></button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        )}
+                    </div>
+
+                    {/* Mobile Card View (Courts) */}
+                    <div className="grid grid-cols-1 gap-4 md:hidden">
+                        {filteredCourts.length === 0 ? (
+                            <div className="p-8 text-center text-gray-500 bg-white rounded-xl border border-dashed border-gray-300">
+                                ยังไม่มีสนามในหมวดหมู่นี้
+                            </div>
+                        ) : (
+                            filteredCourts.map((court) => (
+                                <div key={court.id} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col gap-3">
+                                    <div className="flex items-start justify-between">
+                                        <div className="flex items-center gap-3">
+                                            <img src={court.image_url || 'https://via.placeholder.com/40'} alt={court.name} className="h-12 w-12 rounded-lg object-cover bg-gray-100" />
+                                            <div>
+                                                <h3 className="font-bold text-gray-900">{court.name}</h3>
+                                                <div className="text-sm text-green-600 font-medium">{court.price} บาท/ชม.</div>
+                                            </div>
+                                        </div>
+                                        <span className={`px-2 py-0.5 text-[10px] font-bold rounded-full ${(court.is_active || court.ticket_available) ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
+                                            {(court.is_active || court.ticket_available) ? "เปิด" : "ปิด"}
+                                        </span>
+                                    </div>
+
+                                    <div className="flex justify-end gap-2 pt-2 border-t border-gray-50">
+                                        <button onClick={() => openCourtModal(court)} className="flex items-center gap-1 bg-gray-50 hover:bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg text-sm border border-gray-200 transition">
+                                            <Edit2 size={14} /> แก้ไข
+                                        </button>
+                                        <button onClick={() => handleDeleteCourt(court.id)} className="flex items-center gap-1 bg-red-50 hover:bg-red-100 text-red-600 px-3 py-1.5 rounded-lg text-sm border border-red-200 transition">
+                                            <Trash2 size={14} /> ลบ
+                                        </button>
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </>
             )}
 
             {/* Category Modal */}
