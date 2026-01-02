@@ -94,7 +94,7 @@ const Booking = () => {
             setClosings(closingsData || []);
 
             // 2. Fetch Courts (Use API to bypass RLS issues)
-            const courtsRes = await api.get(`/courts?categoryId=${categoryId}`);
+            const courtsRes = await api.get(`/court?categoryId=${categoryId}`);
             let courtsData = courtsRes.data || [];
             if (!courtsData) courtsData = [];
 
