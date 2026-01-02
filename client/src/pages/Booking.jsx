@@ -82,8 +82,7 @@ const Booking = () => {
         try {
             setLoading(true);
 
-            // 1. Fetch Category Details & Closings (backend endpoints needed or direct DB)
-            // Since we implemented endpoints, let's use them or Supabase direct
+            // 1. Fetch Category Details & Closings
             const { data: catData } = await supabase.from('sport_categories').select('*').eq('id', categoryId).single();
             setCategory(catData);
 
@@ -94,28 +93,20 @@ const Booking = () => {
                 .eq('closing_date', selectedDate);
             setClosings(closingsData || []);
 
-            // 2. Fetch Courts filtered by Category
-            let { data: courtsData, error: courtError } = await supabase
-                .from('courts')
-                .select('*')
-                .eq('is_active', true)
-                .eq('category_id', categoryId)
-                .order('name');
+            // 2. Fetch Courts (Use API to bypass RLS issues)
+            const courtsRes = await api.get(`/courts?categoryId=${categoryId}`);
+            let courtsData = courtsRes.data || [];
+            if (!courtsData) courtsData = [];
 
-            if (courtError || !courtsData) {
-                console.warn("No courts found or DB error");
-                courtsData = [];
-            }
+            // 3. Fetch Bookings (Use API)
+            const bookingsRes = await api.get(`/booking/date/${selectedDate}`);
+            let bookingsData = bookingsRes.data || [];
 
-            // 3. Fetch Bookings 
-            const { data: bookingsData, error: bookingError } = await supabase
-                .from('bookings')
-                .select('*')
-                .eq('booking_date', selectedDate)
-                .neq('status', 'cancelled');
+            // Filter out cancelled
+            bookingsData = bookingsData.filter(b => b.status !== 'cancelled');
 
             setCourts(courtsData);
-            setBookings(bookingsData || []);
+            setBookings(bookingsData);
         } catch (error) {
             console.error('Error fetching data:', error);
             setCourts([]);
