@@ -1,0 +1,228 @@
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { supabase } from '../../lib/supabase';
+import api from '../../lib/api';
+import { Save, Upload, Building, CreditCard, QrCode, X } from 'lucide-react';
+
+const GeneralSettings = () => {
+    const [settings, setSettings] = useState({
+        payment_qr_url: '',
+        bank_name: '',
+        bank_account_number: '',
+        bank_account_name: '',
+        hero_banners: '[]' // JSON string in DB
+    });
+    const [loading, setLoading] = useState(true);
+    const [uploading, setUploading] = useState(false);
+    const [message, setMessage] = useState(null);
+
+    useEffect(() => {
+        fetchSettings();
+    }, []);
+
+    const fetchSettings = async () => {
+        try {
+            const res = await api.get('/settings');
+            if (res.data) {
+                setSettings(res.data);
+            }
+        } catch (error) {
+            console.error('Error fetching settings:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleChange = (e) => {
+        setSettings({ ...settings, [e.target.name]: e.target.value });
+    };
+
+    const handleFileUpload = async (e, type = 'qr') => {
+        try {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            setUploading(true);
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${type}-${Date.now()}.${fileExt}`;
+            const filePath = `settings/${fileName}`;
+
+            const { error: uploadError } = await supabase.storage
+                .from('images')
+                .upload(filePath, file);
+
+            if (uploadError) throw uploadError;
+
+            const { data } = supabase.storage.from('images').getPublicUrl(filePath);
+
+            if (type === 'qr') {
+                setSettings(prev => ({ ...prev, payment_qr_url: data.publicUrl }));
+            } else if (type === 'banner') {
+                let currentBanners = [];
+                try {
+                    currentBanners = settings.hero_banners ? JSON.parse(settings.hero_banners) : [];
+                } catch (e) {
+                    currentBanners = [];
+                }
+                const newBanners = [...currentBanners, data.publicUrl];
+                setSettings(prev => ({ ...prev, hero_banners: JSON.stringify(newBanners) }));
+            }
+
+            setUploading(false);
+        } catch (error) {
+            console.error('Error uploading file:', error);
+            alert('Upload failed: ' + error.message);
+            setUploading(false);
+        }
+    };
+
+    const handleSave = async () => {
+        try {
+            setLoading(true);
+            await axios.put('http://localhost:5000/api/settings', settings);
+            setMessage({ type: 'success', text: 'บันทึกการตั้งค่าเรียบร้อยแล้ว' });
+            setTimeout(() => setMessage(null), 3000);
+        } catch (error) {
+            console.error('Error saving settings:', error);
+            setMessage({ type: 'error', text: 'เกิดข้อผิดพลาดในการบันทึก' });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <div className="space-y-6">
+            <h1 className="text-2xl font-bold text-gray-800">ตั้งค่าทั่วไป (General Settings)</h1>
+
+            {message && (
+                <div className={`p-4 rounded ${message.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                    {message.text}
+                </div>
+            )}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* Bank Details */}
+                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                    <h2 className="text-lg font-bold text-gray-700 mb-4 flex items-center gap-2">
+                        <Building size={20} /> ข้อมูลบัญชีธนาคาร
+                    </h2>
+                    <div className="space-y-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">ชื่อธนาคาร</label>
+                            <input
+                                type="text"
+                                name="bank_name"
+                                value={settings.bank_name || ''}
+                                onChange={handleChange}
+                                className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-green-500 outline-none"
+                                placeholder="เช่น SCB, KBank"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">ชื่อบัญชี</label>
+                            <input
+                                type="text"
+                                name="bank_account_name"
+                                value={settings.bank_account_name || ''}
+                                onChange={handleChange}
+                                className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-green-500 outline-none"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">เลขที่บัญชี</label>
+                            <input
+                                type="text"
+                                name="bank_account_number"
+                                value={settings.bank_account_number || ''}
+                                onChange={handleChange}
+                                className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-green-500 outline-none"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                {/* QR Code */}
+                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 h-fit">
+                    <h2 className="text-lg font-bold text-gray-700 mb-4 flex items-center gap-2">
+                        <QrCode size={20} /> QR Code สำหรับรับชำระเงิน
+                    </h2>
+
+                    <div className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg p-6 bg-gray-50 mb-4">
+                        {settings.payment_qr_url ? (
+                            <img src={settings.payment_qr_url} alt="Payment QR" className="max-h-64 object-contain mb-4" />
+                        ) : (
+                            <div className="text-gray-400 mb-4 flex flex-col items-center">
+                                <QrCode size={48} className="mb-2" />
+                                <span>ยังไม่มี QR Code</span>
+                            </div>
+                        )}
+
+                        <label className="cursor-pointer bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2 rounded shadow-sm flex items-center gap-2 transition-colors">
+                            <Upload size={16} />
+                            {uploading ? 'กำลังอัปโหลด...' : 'อัปโหลดรูปภาพ'}
+                            <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileUpload(e, 'qr')} disabled={uploading} />
+                        </label>
+                    </div>
+                </div>
+
+                {/* Hero Banners */}
+                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 md:col-span-2">
+                    <h2 className="text-lg font-bold text-gray-700 mb-4 flex items-center gap-2">
+                        <Upload size={20} /> แบนเนอร์หน้าแรก (Hero Banners)
+                    </h2>
+
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                        {(() => {
+                            let banners = [];
+                            try {
+                                banners = settings.hero_banners ? JSON.parse(settings.hero_banners) : [];
+                            } catch (e) {
+                                banners = [];
+                            }
+                            return banners.map((url, index) => (
+                                <div key={index} className="relative group aspect-video bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
+                                    <img src={url} alt={`Banner ${index}`} className="w-full h-full object-cover" />
+                                    <button
+                                        onClick={() => {
+                                            const newBanners = banners.filter((_, i) => i !== index);
+                                            setSettings({ ...settings, hero_banners: JSON.stringify(newBanners) });
+                                        }}
+                                        className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-sm hover:bg-red-600"
+                                    >
+                                        <X size={16} />
+                                    </button>
+                                </div>
+                            ));
+                        })()}
+
+                        <label className="cursor-pointer border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center p-4 hover:bg-gray-50 transition-colors aspect-video">
+                            <Upload size={24} className="text-gray-400 mb-2" />
+                            <span className="text-sm text-gray-500">{uploading ? 'กำลัง...' : 'เพิ่มรูปภาพ'}</span>
+                            <input
+                                type="file"
+                                className="hidden"
+                                accept="image/*"
+                                onChange={(e) => handleFileUpload(e, 'banner')}
+                                disabled={uploading}
+                            />
+                        </label>
+                    </div>
+                    <p className="text-xs text-gray-500">* รองรับรูปภาพไม่จำกัดจำนวน (ขนาดแนะนำ 1920x600px)</p>
+                </div>
+            </div>
+
+            <div className="flex justify-end">
+                <button
+                    onClick={handleSave}
+                    disabled={loading}
+                    className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded shadow-md font-bold flex items-center gap-2 transition-colors"
+                >
+                    <Save size={20} />
+                    บันทึกการตั้งค่า
+                </button>
+            </div>
+        </div>
+    );
+};
+
+export default GeneralSettings;
