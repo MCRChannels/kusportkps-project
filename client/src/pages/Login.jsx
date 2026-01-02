@@ -53,7 +53,7 @@ const Login = () => {
 
                     if (fetchError || !data) {
                         console.warn("Lookup failed:", fetchError);
-                        throw new Error('ไม่พบชื่อผู้ใช้นี้ หรือ Database เชื่อมต่อไม่ได้ (กรุณาใช้ Email เข้าสู่ระบบ)');
+                        throw new Error('ไม่พบชื่อผู้ใช้นี้ หรือใส่รหัสผ่านผิดครับ');
                     }
                     loginEmail = data.email;
                 }
@@ -75,7 +75,7 @@ const Login = () => {
                     }
                 });
                 if (error) throw error;
-                alert('สมัครสมาชิกสำเร็จ! กรุณาตรวจสอบอีเมลเพื่อยืนยันตัวตน (ถ้ามี) หรือเข้าสู่ระบบได้เลย');
+                alert('สมัครสมาชิกสำเร็จ!');
                 setIsLogin(true);
             }
         } catch (err) {
@@ -102,7 +102,7 @@ const Login = () => {
                             <CircuitBoard size={48} className="text-white" />
                         </div>
                     </div>
-                    <h1 className="text-5xl font-bold mb-6 tracking-tight">KU Sport</h1>
+                    <h1 className="text-5xl font-bold mb-6 tracking-tight">KU Sport KPS</h1>
                     <p className="text-lg text-green-100 font-light leading-relaxed">
                         ระบบจองสนามกีฬามหาวิทยาลัยเกษตรศาสตร์<br />
                         สะดวก รวดเร็ว และทันสมัยที่สุด

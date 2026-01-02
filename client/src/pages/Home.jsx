@@ -38,7 +38,7 @@ const Home = () => {
     const DEFAULT_IMAGES = [
         "https://scontent.fbkk22-6.fna.fbcdn.net/v/t39.30808-6/571120155_4122047174607325_964887027510442636_n.png?_nc_cat=104&_nc_cb=99be929b-f3b7c874&ccb=1-7&_nc_sid=cc71e4&_nc_eui2=AeHFZIgMRNH8liPuZQOJOZlesqWbNRDUnJSypZs1ENSclOWZaOBWK4yJeanP4khqTLyruhDrPLee9jfUFdhXSKrP&_nc_ohc=CFTQSspRqiQQ7kNvwEiugRT&_nc_oc=Adn9RoyVKpcm7Q4kFftbzWxNdTaHrMZMdwNWVQlNbqjWL75XHVEVtX9iSwQzzH4gHLrmgxVYQBhnvzTKzCVLRAg6&_nc_zt=23&_nc_ht=scontent.fbkk22-6.fna&_nc_gid=yCPs5tieJpTtvuEwcVqwcQ&oh=00_Afn1q4GHRN-QvXo_s6hcDf4jf9Z4h4dYbslqhtJuuCBs-g&oe=695A4DC7",
         "https://scontent.fbkk31-1.fna.fbcdn.net/v/t39.30808-6/601427499_4192714450873930_2070510421863645213_n.jpg?_nc_cat=106&_nc_cb=99be929b-f3b7c874&ccb=1-7&_nc_sid=127cfc&_nc_eui2=AeHXpGhtsbUtnGH4XI64V5lfhHdShHAeCJ6Ed1KEcB4Inuc_-i6BRe3Hc8nz9rbCbQjH4HCG0tAP7ehfdZgiYQ45&_nc_ohc=Go9iLUnKKcEQ7kNvwHLd0I4&_nc_oc=Adn-KZCnzkz5pJ5-GzEfLzoLPZ3c35_gBpgNqIiv-fQnG3gTtNHNXbtzX5QA1IlepVDJuqyvMzGQQvbejG0aR_3f&_nc_zt=23&_nc_ht=scontent.fbkk31-1.fna&_nc_gid=yNeAgktcKrPMBMPRSAXSEA&oh=00_AfpaqpV5Qv-FLpNrgJQTMQ2sdn85eSMqBNF7--iufpGM9g&oe=695DAABB",
-        "https://scontent.fbkk31-1.fna.fbcdn.net/v/t39.30808-6/605262389_4192715120873863_4246852424786332388_n.jpg?_nc_cat=100&_nc_cb=99be929b-f3b7c874&ccb=1-7&_nc_sid=127cfc&_nc_eui2=AeGW5ICiw-EvjKhvxw0xjt_IdjeDm72vIt12N4Obva8i3fL39YjUVgbFnwPYmTTllzaiXqWKkzBNHfJqA3aZUxAu&_nc_ohc=WQY94jjdYi0Q7kNvwEzTIor&_nc_oc=AdmPpFJqKPshnOMI9kTOAfplPfck7-bqyP0WW9A7JP9QmeJSOkFz6cItygyEJIGyIzLk8yhlg1-ZZPtv_3aZ2GOL&_nc_zt=23&_nc_ht=scontent.fbkk31-1.fna&_nc_gid=cDlQY9m_Q1t1mm5WADCTVQ&oh=00_Afren6Iy5DtIkzPztfwSKX67Q2cQwqMoVs7nsPqxwt4wcQ&oe=695DAB1Eเ"
+        "https://scontent.fbkk31-1.fna.fbcdn.net/v/t39.30808-6/605262389_4192715120873863_4246852424786332388_n.jpg?_nc_cat=100&_nc_cb=99be929b-f3b7c874&ccb=1-7&_nc_sid=127cfc&_nc_eui2=AeGW5ICiw-EvjKhvxw0xjt_IdjeDm72vIt12N4Obva8i3fL39YjUVgbFnwPYmTTllzaiXqWKkzBNHfJqA3aZUxAu&_nc_ohc=WQY94jjdYi0Q7kNvwEzTIor&_nc_oc=AdmPpFJqKPshnOMI9kTOAfplPfck7-bqyP0WW9A7JP9QmeJSOkFz6cItygyEJIGyIzLk8yhlg1-ZZPtv_3aZ2GOL&_nc_zt=23&_nc_ht=scontent.fbkk31-1.fna&_nc_gid=cDlQY9m_Q1t1mm5WADCTVQ&oh=00_Afren6Iy5DtIkzPztfwSKX67Q2cQwqMoVs7nsPqxwt4wcQ&oe=695DAB1E"
     ];
 
     const [heroImages, setHeroImages] = useState(DEFAULT_IMAGES);
@@ -89,8 +89,8 @@ const Home = () => {
             {/* Standard Hero/Carousel Section */}
             <FadeIn>
                 <div className="bg-white border-b border-gray-200">
-                    <div className="container mx-auto px-0 md:px-4 py-4 md:py-8">
-                        <div className="relative w-full h-[250px] md:h-[450px] lg:h-[500px] overflow-hidden rounded-none md:rounded-sm shadow-sm bg-black group">
+                    <div className="container mx-auto px-0 md:px-4 py-0 md:py-8">
+                        <div className="relative w-full h-[250px] md:h-[450px] lg:h-[500px] overflow-hidden rounded-none md:rounded-sm shadow-sm bg-gray-900 group">
                             {heroImages.map((img, index) => (
                                 <div
                                     key={index}
@@ -99,7 +99,7 @@ const Home = () => {
                                 >
                                     {/* Blurred Background for Ambience */}
                                     <div
-                                        className="absolute inset-0 bg-cover bg-center blur-md opacity-50 scale-110"
+                                        className="absolute inset-0 bg-cover bg-center blur-xl scale-110 brightness-50"
                                         style={{ backgroundImage: `url(${img})` }}
                                     />
                                     {/* Main Image */}

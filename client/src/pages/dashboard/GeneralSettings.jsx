@@ -79,12 +79,12 @@ const GeneralSettings = () => {
     const handleSave = async () => {
         try {
             setLoading(true);
-            await axios.put('http://localhost:5000/api/settings', settings);
+            await api.put('/settings', settings);
             setMessage({ type: 'success', text: 'บันทึกการตั้งค่าเรียบร้อยแล้ว' });
             setTimeout(() => setMessage(null), 3000);
         } catch (error) {
             console.error('Error saving settings:', error);
-            setMessage({ type: 'error', text: 'เกิดข้อผิดพลาดในการบันทึก' });
+            setMessage({ type: 'error', text: 'เกิดข้อผิดพลาด: ' + (error.response?.data?.error || error.message) });
         } finally {
             setLoading(false);
         }
